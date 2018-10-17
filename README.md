@@ -12,3 +12,12 @@ Starter react app initilized by create-react-app with following dependencies
 "redux-persist": "^5.10.0",
 "redux-thunk": "^2.3.0"
 ```
+
+### App routes
+They are three routes in this starter app one is only for admin user, go to profile to login
+
+```shell
+/
+/profiles
+/admin
+```
