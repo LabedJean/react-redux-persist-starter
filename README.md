@@ -18,6 +18,6 @@ They are three routes in this starter app one is only for admin user, go to prof
 
 ```shell
 /
-/profiles
+/profile
 /admin
 ```
