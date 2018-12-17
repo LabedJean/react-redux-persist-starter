@@ -17,7 +17,6 @@ Starter react app initilized by create-react-app with following dependencies
 They are three routes in this starter app one is only for admin user, go to profile to login
 
 ```shell
-/
-/profile
-/admin
+/         # Public routes 
+/admin    # Admin routes
 ```
