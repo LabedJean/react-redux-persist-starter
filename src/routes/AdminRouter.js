@@ -3,22 +3,17 @@ import {Switch, Route, withRouter} from 'react-router-dom';
 import Profile from '../components/Profile';
 import Admin from '../components/Admin';
 import { connect } from 'react-redux';
-import AdminRouter from './AdminRouter';
-import PublicRouter from './PublicRouter';
 
 class AppRouter extends Component {
   render() {
     return (
-      <div>
+      <Switch>
         {
-          !window.location.href.includes('admin') &&
-          <PublicRouter />
+          // All routes under this verification are reserved for admin users
+          this.props.authentification.user.userData.isAdmin &&
+          <Route exact path='/admin' component={Admin}/>
         }
-        {
-          window.location.href.includes('admin') &&
-          <AdminRouter />
-        }
-      </div>
+      </Switch>
     )
   }
 }
@@ -31,4 +26,4 @@ const mapStateToProps = state => ({
   ...state
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(AppRouter);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(AppRouter));
