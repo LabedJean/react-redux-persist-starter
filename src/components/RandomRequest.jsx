@@ -57,6 +57,15 @@ export class RandomRequest extends Component {
       .catch((err) => console.log(err))
   }
 
+  deleteResult(id){
+    Axios.delete(`http://127.0.0.1:3000/api/v1/random_results/${id}`)
+      .then((res) => {
+        console.log(res)
+        this.fetchResults()
+      })
+      .catch((err) => console.log(err))
+  }
+
   getRandomField(){
     const fields = this.state.currentSelected.fields
     const rand = fields[Math.floor(Math.random() * fields.length)];
@@ -74,7 +83,7 @@ export class RandomRequest extends Component {
               <th>Titre</th>
               <th>Description</th>
               <th>Détails</th>
-              {/* <th>Champs</th> */}
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -97,6 +106,9 @@ export class RandomRequest extends Component {
                     <td
                       onClick={() => this.setState({ currentSelected: rr, modal: true })}
                     >Voir</td>
+                    <td
+                      onClick={() => this.deleteResult(rr.id)}
+                    >Supprimer</td>
                   </tr>
                 )
               })
@@ -104,7 +116,6 @@ export class RandomRequest extends Component {
           </tbody>
         </Table>
         <div>
-          <Button color="danger" onClick={this.toggle}>{this.props.buttonLabel}</Button>
           <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
             <ModalHeader toggle={this.toggle}>{this.state.currentSelected.title}</ModalHeader>
             <ModalBody>
