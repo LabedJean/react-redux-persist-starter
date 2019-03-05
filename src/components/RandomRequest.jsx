@@ -33,6 +33,7 @@ export class RandomRequest extends Component {
 
   componentDidMount() {
     this.fetchResults()
+    console.log("YOUR ENVIRONMENT IS : ",  process.env.NODE_ENV)
   }
 
   fetchResults(setCurrent = false) {
