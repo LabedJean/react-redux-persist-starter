@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Axios from 'axios';
 import { Table, Button, Modal, ModalHeader, ModalBody, ModalFooter, Container, Row, Col } from 'reactstrap';
+import { randomResult } from '../utils/urls'
 
 const defaultResult = { fields: [{}] };
 
@@ -14,7 +15,10 @@ export class RandomRequest extends Component {
       currentSelected: defaultResult,
       modal: false,
       fieldTitle: '',
-      currentRandomField: ''
+      currentRandomField: '',
+      showForm: false,
+      requestTitle: '',
+      requestDescription: ''
     }
     this.toggle = this.toggle.bind(this);
   }
@@ -30,7 +34,7 @@ export class RandomRequest extends Component {
   }
 
   fetchResults(setCurrent=false){
-    Axios.get('http://127.0.0.1:3000/api/v1/random_results')
+    Axios.get(`${randomResult}`)
       .then((res) => {
         console.log(res)
         const current = setCurrent ? res.data.find(x => x.id === this.state.currentSelected.id) : defaultResult
@@ -40,7 +44,7 @@ export class RandomRequest extends Component {
   }
 
   linkField(){
-    Axios.post(`http://127.0.0.1:3000/api/v1/random_results/${this.state.currentSelected.id}/add_field`, {title: this.state.fieldTitle})
+    Axios.post(`${randomResult}/${this.state.currentSelected.id}/add_field`, {title: this.state.fieldTitle})
       .then((res) => {
         console.log(res)
         this.fetchResults(true)
@@ -49,7 +53,7 @@ export class RandomRequest extends Component {
   }
 
   deleteField(fieldId){
-    Axios.delete(`http://127.0.0.1:3000/api/v1/random_results/${this.state.currentSelected.id}/delete_field`, {data: {field_id: fieldId}})
+    Axios.delete(`${randomResult}/${this.state.currentSelected.id}/delete_field`, {data: {field_id: fieldId}})
       .then((res) => {
         console.log(res)
         this.fetchResults(true)
@@ -57,8 +61,18 @@ export class RandomRequest extends Component {
       .catch((err) => console.log(err))
   }
 
+  createResult(event){
+    event.preventDefault()
+    Axios.post(`${randomResult}`, {title: this.state.requestTitle, description: this.state.requestDescription})
+      .then((res) => {
+        console.log(res)
+        this.fetchResults()
+      })
+      .catch((err) => console.log(err))
+  }
+
   deleteResult(id){
-    Axios.delete(`http://127.0.0.1:3000/api/v1/random_results/${id}`)
+    Axios.delete(`${randomResult}/${id}`)
       .then((res) => {
         console.log(res)
         this.fetchResults()
@@ -74,8 +88,40 @@ export class RandomRequest extends Component {
 
   render() {
     console.log(this.state)
+    const buttonTitle = this.state.showForm ? 'Fermer' : 'Ajouter'
     return (
       <div>
+        <Button color="primary" onClick={() => this.setState({showForm: !this.state.showForm})}>{buttonTitle}</Button>{' '}
+        {
+          this.state.showForm &&
+          <div>
+            <form
+              onSubmit={(e) => this.createResult(e)}
+            >
+              <span>
+                <label htmlFor="requestTitle">Titre</label>
+                <input 
+                  onChange={(e) => this.setState({[e.target.name]: e.target.value})} 
+                  type="text" 
+                  name="requestTitle" 
+                  id="requestTitle" 
+                  value={this.state.requestTitle}
+                />
+              </span>
+              <span>
+                <label htmlFor="requestDescription">Description</label>
+                <input 
+                  onChange={(e) => this.setState({[e.target.name]: e.target.value})} 
+                  type="text" 
+                  name="requestDescription" 
+                  id="requestDescription" 
+                  value={this.state.requestDescription}
+                />
+              </span>
+              <input type="submit" value="Créer"/>
+            </form>
+          </div>
+        }
         <Table>
           <thead>
             <tr>
