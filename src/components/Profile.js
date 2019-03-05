@@ -6,10 +6,8 @@ import { connect } from 'react-redux';
 class Profile extends Component {
   render() {
     return (
-      <div>
-        <button
-          onClick={() => this.props.authAction({userId: 1, isAdmin: true, username: 'Jh0n_D03', isConnected: true})}
-        >Click ME to login as Admin</button>
+      <div className="App">
+        <h1>Hello Wilders !</h1>
       </div>
     )
   }
