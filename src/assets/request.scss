@@ -1,0 +1,34 @@
+.request-form {
+  margin: 15px 0px;
+}
+
+.labelized-field {
+  margin-right: 15px;
+  label {
+    margin-right: 5px;
+  }
+}
+
+.add-request-button {
+  margin: 5px 0px;
+}
+
+.add-field-button-container {
+  input {display: inline; margin-right: 10px;}
+}
+
+.random-result-data {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.fields-list {
+  text-align: right;
+  li {
+    margin-top: 5px;
+    button {margin-left: 5px;}
+  }
+}

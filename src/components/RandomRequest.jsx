@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Axios from 'axios';
-import { Table, Button, Modal, ModalHeader, ModalBody, ModalFooter, Container, Row, Col } from 'reactstrap';
+import { Table, Button, Modal, ModalHeader, ModalBody, ModalFooter, Container, Row, Col, Spinner } from 'reactstrap';
 import { randomResult } from '../utils/urls'
+
+import '../assets/request.scss'
 
 const defaultResult = { fields: [{}] };
 
@@ -33,7 +35,7 @@ export class RandomRequest extends Component {
     this.fetchResults()
   }
 
-  fetchResults(setCurrent=false){
+  fetchResults(setCurrent = false) {
     Axios.get(`${randomResult}`)
       .then((res) => {
         console.log(res)
@@ -43,8 +45,8 @@ export class RandomRequest extends Component {
       .catch((err) => console.log(err))
   }
 
-  linkField(){
-    Axios.post(`${randomResult}/${this.state.currentSelected.id}/add_field`, {title: this.state.fieldTitle})
+  linkField() {
+    Axios.post(`${randomResult}/${this.state.currentSelected.id}/add_field`, { title: this.state.fieldTitle })
       .then((res) => {
         console.log(res)
         this.fetchResults(true)
@@ -52,8 +54,8 @@ export class RandomRequest extends Component {
       .catch((err) => console.log(err))
   }
 
-  deleteField(fieldId){
-    Axios.delete(`${randomResult}/${this.state.currentSelected.id}/delete_field`, {data: {field_id: fieldId}})
+  deleteField(fieldId) {
+    Axios.delete(`${randomResult}/${this.state.currentSelected.id}/delete_field`, { data: { field_id: fieldId } })
       .then((res) => {
         console.log(res)
         this.fetchResults(true)
@@ -61,9 +63,9 @@ export class RandomRequest extends Component {
       .catch((err) => console.log(err))
   }
 
-  createResult(event){
+  createResult(event) {
     event.preventDefault()
-    Axios.post(`${randomResult}`, {title: this.state.requestTitle, description: this.state.requestDescription})
+    Axios.post(`${randomResult}`, { title: this.state.requestTitle, description: this.state.requestDescription })
       .then((res) => {
         console.log(res)
         this.fetchResults()
@@ -71,7 +73,7 @@ export class RandomRequest extends Component {
       .catch((err) => console.log(err))
   }
 
-  deleteResult(id){
+  deleteResult(id) {
     Axios.delete(`${randomResult}/${id}`)
       .then((res) => {
         console.log(res)
@@ -80,67 +82,76 @@ export class RandomRequest extends Component {
       .catch((err) => console.log(err))
   }
 
-  getRandomField(){
+  async getRandomField() {
+    await this.setState({loading: true, currentRandomField: ''})
     const fields = this.state.currentSelected.fields
     const rand = fields[Math.floor(Math.random() * fields.length)];
-    this.setState({currentRandomField: rand ? rand.title : ''})
+    setTimeout(() => {
+      this.setState({ currentRandomField: rand ? rand.title : '', loading: false })
+    }, 1500)
   }
 
   render() {
     console.log(this.state)
-    const buttonTitle = this.state.showForm ? 'Fermer' : 'Ajouter'
+    const buttonTitle = this.state.showForm ? '-' : '+'
     return (
-      <div>
-        <Button color="primary" onClick={() => this.setState({showForm: !this.state.showForm})}>{buttonTitle}</Button>{' '}
+      <Container>
+        <Button size="sm" className="add-request-button" color="primary" onClick={() => this.setState({ showForm: !this.state.showForm })}>{buttonTitle}</Button>{' '}
         {
           this.state.showForm &&
-          <div>
-            <form
-              onSubmit={(e) => this.createResult(e)}
-            >
-              <span>
-                <label htmlFor="requestTitle">Titre</label>
-                <input 
-                  onChange={(e) => this.setState({[e.target.name]: e.target.value})} 
-                  type="text" 
-                  name="requestTitle" 
-                  id="requestTitle" 
-                  value={this.state.requestTitle}
-                />
-              </span>
-              <span>
-                <label htmlFor="requestDescription">Description</label>
-                <input 
-                  onChange={(e) => this.setState({[e.target.name]: e.target.value})} 
-                  type="text" 
-                  name="requestDescription" 
-                  id="requestDescription" 
-                  value={this.state.requestDescription}
-                />
-              </span>
-              <input type="submit" value="Créer"/>
-            </form>
-          </div>
+          <Row>
+            <Col>
+              <div className="request-form">
+                <form
+                  onSubmit={(e) => this.createResult(e)}
+                >
+                  <span className="labelized-field">
+                    <label htmlFor="requestTitle">Titre</label>
+                    <input
+                      onChange={(e) => this.setState({ [e.target.name]: e.target.value })}
+                      type="text"
+                      name="requestTitle"
+                      id="requestTitle"
+                      value={this.state.requestTitle}
+                    />
+                  </span>
+                  <span className="labelized-field">
+                    <label htmlFor="requestDescription">Description</label>
+                    <input
+                      onChange={(e) => this.setState({ [e.target.name]: e.target.value })}
+                      type="text"
+                      name="requestDescription"
+                      id="requestDescription"
+                      value={this.state.requestDescription}
+                    />
+                  </span>
+                  <input type="submit" value="Créer" />
+                </form>
+              </div>
+            </Col>
+          </Row>
         }
-        <Table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Titre</th>
-              <th>Description</th>
-              <th>Détails</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {
-              this.state.requestResults.map((rr, idx) => {
-                return (
-                  <tr key={`rr-${rr.id}`}>
-                    <th scope="row">{idx + 1}</th>
-                    <td>{rr.title}</td>
-                    <td>{rr.description}</td>
-                    {/* <td>
+        <Row>
+          <Col>
+            <Table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Titre</th>
+                  <th>Description</th>
+                  <th>Détails</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {
+                  this.state.requestResults.map((rr, idx) => {
+                    return (
+                      <tr key={`rr-${rr.id}`}>
+                        <th scope="row">{idx + 1}</th>
+                        <td>{rr.title}</td>
+                        <td>{rr.description}</td>
+                        {/* <td>
                       <ul>
                         {
                           rr.fields.map((field) => {
@@ -149,54 +160,67 @@ export class RandomRequest extends Component {
                         }
                       </ul>
                     </td> */}
-                    <td
-                      onClick={() => this.setState({ currentSelected: rr, modal: true })}
-                    >Voir</td>
-                    <td
-                      onClick={() => this.deleteResult(rr.id)}
-                    >Supprimer</td>
-                  </tr>
-                )
-              })
-            }
-          </tbody>
-        </Table>
+                        <td
+                          onClick={() => this.setState({ currentSelected: rr, modal: true })}
+                        >Voir</td>
+                        <td
+                          onClick={() => this.deleteResult(rr.id)}
+                        >Supprimer</td>
+                      </tr>
+                    )
+                  })
+                }
+              </tbody>
+            </Table>
+          </Col>
+        </Row>
         <div>
           <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
             <ModalHeader toggle={this.toggle}>{this.state.currentSelected.title}</ModalHeader>
             <ModalBody>
               <Container>
                 <Row>
-                  <Col>
+                  <Col xs="5">
                     <p>{this.state.currentSelected.description}</p>
-                    <h3>{this.state.currentRandomField}</h3>
+                    <Row>
+                      <div className="random-result-data">
+                        <h3>{this.state.currentRandomField}</h3>
+                        {
+                          this.state.loading &&
+                          <Spinner style={{ width: '3rem', height: '3rem' }} type="grow" />
+                        }
+                      </div>
+                    </Row>
                   </Col>
-                  <Col>
+                  <Col xs="7">
                     <div>
-                      <span>
-                        <input 
+                      <span className="add-field-button-container">
+                        <input
                           type="text"
                           name="fieldTitle"
                           value={this.state.fieldTitle}
-                          onChange={(e) => this.setState({[e.target.name]: e.target.value})}
+                          onChange={(e) => this.setState({ [e.target.name]: e.target.value })}
                         />
-                        <Button 
-                          color="primary" 
+                        <Button
+                          size="sm"
+                          color="primary"
                           onClick={() => this.linkField()}
                         >
                           Add
                         </Button>
                       </span>
                     </div>
-                    <ul>
+                    <ul className="fields-list">
                       {
                         this.state.currentSelected.fields.map((field) => {
                           return (
                             <li key={`li-f-${field.id}`}>
                               {field.title}
-                              <span
+                              <Button
+                                size="sm"
+                                color="warning"
                                 onClick={() => this.deleteField(field.id)}
-                              >X</span>
+                              >X</Button>
                             </li>
                           )
                         })
@@ -207,12 +231,11 @@ export class RandomRequest extends Component {
               </Container>
             </ModalBody>
             <ModalFooter>
-              <Button color="primary" onClick={() => this.getRandomField()}>Get Random</Button>{' '}
-              <Button color="secondary" onClick={this.toggle}>Cancel</Button>
+              <Button color="success" onClick={() => this.getRandomField()}>Get Random</Button>{' '}
             </ModalFooter>
           </Modal>
         </div>
-      </div>
+      </Container>
     )
   }
 }
